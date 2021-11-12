@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://github.com/awslabs/sagemaker-deep-demand-forecast/blob/mainline/LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/github/license/awslabs/sagemaker-deep-demand-forecast.svg"></a>
+  <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+  <br>
+  <a href="https://github.com/awslabs/sagemaker-deep-demand-forecast/graphs/commit-activity"><img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg"></a>
+  <a href="https://github.com/awslabs/sagemaker-deep-demand-forecast/issues/new?assignees=ehsanmok&labels=question&template=questions-or-general-feedbacks.md&title=%5BGeneral%5D"><img alt="AMA" src="https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg"></a>
+  <a href="https://github.com/ellerbrock/open-source-badges/"><img alt="OSS Love" src="https://badges.frapsoft.com/os/v1/open-source.png?v=103"></a>
+ </p>
+
 # Corporate Credit Rating
 
 This SageMaker JumpStart Industry solution provides a template for a _*text-enhanced*_ credit rating model. It shows how to take a model based on numeric features (in this case, Altman's famous 5 financial ratios) combined with texts from SEC filings so as to achieve an improvement in the prediction of credit ratings. You are not restricted to the 5 Altman ratios; you can add more variables as needed or completely change the variables. The main objective of this solution notebook is to show how SageMaker JumpStart Industry can help process NLP scoring of SEC filings text and use the [Altman's Z-score](https://www.creditguru.com/index.php/bankruptcy-and-insolvency/altman-z-score-insolvency-predictor) to compute the Altman's 5 financial ratios to enhance features, train a model using the enhanced features to achieve a best-in-class model, deploy the model to a SageMaker endpoint for production, and receive improved predictions in real time.
