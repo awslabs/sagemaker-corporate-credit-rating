@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "(SA00017) - corporate-credit-rating SageMaker endpoint stack"
+Parameters:
+  SolutionPrefix:
+    Type: String
+  SolutionName:
+    Type: String
+  SageMakerIAMRoleArn:
+    Type: String
+  SolutionRefBucketBase:
+    Type: String
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      "MXNetInference": "763104351884.dkr.ecr.us-east-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    us-east-2:
+      "MXNetInference": "763104351884.dkr.ecr.us-east-2.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    us-west-1:
+      "MXNetInference": "763104351884.dkr.ecr.us-west-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    us-west-2:
+      "MXNetInference": "763104351884.dkr.ecr.us-west-2.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    ca-central-1:
+      "MXNetInference": "763104351884.dkr.ecr.ca-central-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    eu-west-1:
+      "MXNetInference": "763104351884.dkr.ecr.eu-west-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    eu-west-2:
+      "MXNetInference": "763104351884.dkr.ecr.eu-west-2.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    eu-west-3:
+      "MXNetInference": "763104351884.dkr.ecr.eu-west-3.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    eu-central-1:
+      "MXNetInference": "763104351884.dkr.ecr.eu-central-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    eu-north-1:
+      "MXNetInference": "763104351884.dkr.ecr.eu-north-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    eu-south-1:
+      "MXNetInference": "692866216735.dkr.ecr.eu-south-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    ap-northeast-1:
+      "MXNetInference": "763104351884.dkr.ecr.ap-northeast-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    ap-northeast-2:
+      "MXNetInference": "763104351884.dkr.ecr.ap-northeast-2.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    ap-southeast-1:
+      "MXNetInference": "763104351884.dkr.ecr.ap-southeast-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    ap-southeast-2:
+      "MXNetInference": "763104351884.dkr.ecr.ap-southeast-2.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    ap-south-1:
+      "MXNetInference": "763104351884.dkr.ecr.ap-south-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    sa-east-1:
+      "MXNetInference": "763104351884.dkr.ecr.sa-east-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    me-south-1:
+      "MXNetInference": "217643126080.dkr.ecr.me-south-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    ap-east-1:
+      "MXNetInference": "871362719292.dkr.ecr.ap-east-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+    af-south-1:
+      "MXNetInference": "626614931356.dkr.ecr.af-south-1.amazonaws.com/mxnet-inference:1.8.0-cpu-py37"
+
+Resources:
+  Endpoint:
+    Type: "AWS::SageMaker::Endpoint"
+    Properties:
+      EndpointName: !Sub "${SolutionPrefix}-demo-endpoint"
+      EndpointConfigName: !GetAtt EndpointConfig.EndpointConfigName
+
+  EndpointConfig:
+    Type: "AWS::SageMaker::EndpointConfig"
+    Properties:
+      EndpointConfigName: !Sub "${SolutionPrefix}-demo-endpoint"
+      ProductionVariants:
+        - InitialInstanceCount: 1
+          InitialVariantWeight: 1.0
+          InstanceType: "ml.m5.xlarge"
+          ModelName: !GetAtt Model.ModelName
+          VariantName: !GetAtt Model.ModelName
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W1200
+            reason: Solution does not have KMS encryption enabled by default
+
+  Model:
+    Type: "AWS::SageMaker::Model"
+    Properties:
+      ModelName: !Sub "${SolutionPrefix}-demo-model"
+      PrimaryContainer:
+        ModelDataUrl: !Sub "https://${SolutionRefBucketBase}-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/${SolutionName}/build/model.tar.gz"
+        Image: !FindInMap [RegionMap, !Ref "AWS::Region", MXNetInference]
+        Mode: "SingleModel"
+      ExecutionRoleArn: !Sub "${SageMakerIAMRoleArn}"
+
+Outputs:
+  EndpointName:
+    Description: Name of the demo endpoint
+    Value: !GetAtt Endpoint.EndpointName

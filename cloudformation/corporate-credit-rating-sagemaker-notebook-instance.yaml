@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "(SA00017) - corporate-credit-rating SageMaker notebook stack"
+Parameters:
+  SolutionPrefix:
+    Type: String
+  SolutionName:
+    Type: String
+  S3Bucket:
+    Type: String
+  SageMakerIAMRoleArn:
+    Type: String
+  SageMakerNotebookInstanceType:
+    Type: String
+  StackVersion:
+    Type: String
+
+Mappings:
+  S3:
+    release:
+      BucketPrefix: "sagemaker-solutions-prod"
+    development:
+      BucketPrefix: "sagemaker-solutions-devo"
+
+Resources:
+  NotebookInstance:
+    Type: "AWS::SageMaker::NotebookInstance"
+    Properties:
+      DirectInternetAccess: Enabled
+      InstanceType: !Ref SageMakerNotebookInstanceType
+      LifecycleConfigName: !GetAtt LifeCycleConfig.NotebookInstanceLifecycleConfigName
+      NotebookInstanceName: !Sub "${SolutionPrefix}-nb"
+      RoleArn: !Sub "${SageMakerIAMRoleArn}"
+      VolumeSizeInGB: 100
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W1201
+            reason: Solution does not have KMS encryption enabled by default
+  LifeCycleConfig:
+    Type: "AWS::SageMaker::NotebookInstanceLifecycleConfig"
+    Properties:
+      NotebookInstanceLifecycleConfigName: !Sub "${SolutionPrefix}-nb-lifecycle-config"
+      OnStart:
+        - Content:
+            Fn::Base64: |
+              set -e
+              sudo -u ec2-user -i <<EOF
+              cd /home/ec2-user/SageMaker
+              source /home/ec2-user/anaconda3/bin/activate mxnet_p36
+              python -m pip install -r corporate-credit-rating/requirements.txt
+              source /home/ec2-user/anaconda3/bin/deactivate
+              EOF
+      OnCreate:
+        - Content:
+            Fn::Base64: !Sub
+              - |
+                set -e
+                sudo -u ec2-user -i <<EOF
+                cd /home/ec2-user/SageMaker
+                aws s3 sync s3://${SolutionsRefBucketBase}-${AWS::Region}/${SolutionName}/src .
+                sed -s -i 's/HUB_1P_IMAGE/conda_python3/g' *.ipynb
+                touch stack_outputs.json
+                echo '{' >> stack_outputs.json
+                echo '  "AccountID": "${AWS::AccountId}",' >> stack_outputs.json
+                echo '  "AWSRegion": "${AWS::Region}",' >> stack_outputs.json
+                echo '  "IamRole": "${SageMakerIAMRoleArn}",' >> stack_outputs.json
+                echo '  "SolutionPrefix": "${SolutionPrefix}",' >> stack_outputs.json
+                echo '  "SolutionName": "${SolutionName}",' >> stack_outputs.json
+                echo '  "SolutionS3Bucket": "${SolutionsRefBucketBase}",' >> stack_outputs.json
+                echo '  "S3Bucket": "${S3Bucket}",' >> stack_outputs.json
+                echo '}' >> stack_outputs.json
+                cat stack_outputs.json
+                sudo chown -R ec2-user:ec2-user *
+                EOF
+              - SolutionsRefBucketBase:
+                  !FindInMap [S3, !Ref StackVersion, BucketPrefix]
+
+Outputs:
+  SourceCode:
+    Description: "Open Jupyter IDE. This authenticate you against Jupyter."
+    Value: !Sub "https://${NotebookInstance.NotebookInstanceName}.notebook.${AWS::Region}.sagemaker.aws/"
+
+  SageMakerNotebookInstanceSignOn:
+    Description: "Link to the SageMaker notebook instance"
+    Value: !Sub "https://${NotebookInstance.NotebookInstanceName}.notebook.${AWS::Region}.sagemaker.aws/notebooks/"
