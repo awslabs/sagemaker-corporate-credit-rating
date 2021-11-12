@@ -94,7 +94,7 @@ For more information about cleaning up resources, see [Clean Up](https://docs.aw
 
 ### Synthetic Dataset
 
-We created a synthetic dataset that combines texts from randomly selected SEC filings (**MDNA**), the industrial classification codes (**industry_code**), and simulated tabular data with 8 financial variables that are essential to calculate the Altmanâ€™s Z-score. We created the synthetic dataset using the following procedure:
+We created a synthetic dataset that combines texts from randomly selected SEC filings (**MDNA**), the industrial classification codes (**industry_code**), and simulated tabular data with 8 financial variables that are essential to calculate the Altman's Z-score. We created the synthetic dataset using the following procedure:
 
 1. Extract the Management Discussion and Analysis (**MDNA**) section of the 10-K/Q SEC filings from a random sample of 3286 firms.
 2. Run an NLP-scoring processing job to score the **MDNA** texts for 5 positive attributes (**positivity**, **sentiment**, **polarity**, **safety**, **certainty**) and 5 negative attributes (**negativity**, **litigiousness**, **fraud**, **risk**, **uncertainty**). To rank the firms based on the 10 NLP score attributes, add the values of the positive 5 attributes and subtract the values of the negative 5 attributes; the net values are called the *NLP score rank* hereafter.
