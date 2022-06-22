@@ -26,7 +26,7 @@ jmespath==0.10.0
     #   botocore
 multiprocess==0.70.12.2
     # via pathos
-numpy==1.21.3
+numpy==1.22.0
     # via
     #   pandas
     #   sagemaker
@@ -66,10 +66,10 @@ six==1.16.0
     #   ppft
     #   protobuf3-to-dict
     #   python-dateutil
-smdebug_rulesconfig==1.0.1
+smdebug-rulesconfig==1.0.1
     # via sagemaker
 smjsindustry==1.0.0
-    # via -r -
+    # via -r nb_requirements.in
 urllib3==1.26.7
     # via botocore
 zipp==3.6.0
