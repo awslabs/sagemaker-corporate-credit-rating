@@ -26,7 +26,7 @@ jmespath==0.10.0
     #   botocore
 multiprocess==0.70.12.2
     # via pathos
-numpy==1.21.3
+numpy==1.22.0
     # via
     #   pandas
     #   sagemaker
