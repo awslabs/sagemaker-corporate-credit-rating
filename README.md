@@ -152,7 +152,7 @@ The following diagram shows the architecture for model inference.
 
 ## Clean Up
 
-After you are done using the solution notebook, make sure to delete all AWS resources that you donâ€™t need to keep running. You can use AWS CloudFormation to automatically delete all standard resources that the solution and the notebook created. Go to the AWS CloudFormation console and delete the parent stack. Deleting the parent stack will automatically delete the nested stacks.
+After you are done using the solution notebook, make sure to delete all AWS resources that you don't need to keep running. You can use AWS CloudFormation to automatically delete all standard resources that the solution and the notebook created. Go to the AWS CloudFormation console and delete the parent stack. Deleting the parent stack will automatically delete the nested stacks.
 
 **Caution:** You need to manually delete any other resources that you may have created while running the notebook, such as Amazon S3 buckets to the solution's default bucket, Amazon SageMaker endpoints using custom names, and Amazon ECR repositories.
 
